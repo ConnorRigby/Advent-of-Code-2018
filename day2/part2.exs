@@ -18,7 +18,7 @@ defmodule AOC.Day2.Part2 do
   end
 
   test "result" do
-    input = File.read!("input.txt") |> String.split("\n")
+    input = File.read!("input.txt") |> String.trim() |> String.split("\n")
     assert evaluate(input) == "rmyxgdlihczskunpfijqcebtv"
   end
 
@@ -37,23 +37,10 @@ defmodule AOC.Day2.Part2 do
 
   defp do_check(string, check) do
     IO.puts("checking #{string} with #{check}")
-    do_check({string, check}, string, check, [])
-  end
 
-  defp do_check(o, <<string_char, string_rest::binary>>, <<check_char, check_rest::binary>>, dif) do
-    if string_char == check_char do
-      do_check(o, string_rest, check_rest, dif)
-    else
-      do_check(o, string_rest, check_rest, dif ++ [<<check_char>>, <<string_char>>])
+    case String.myers_difference(string, check) do
+      [eq: pt1, del: <<_>>, ins: <<_>>, eq: pt2] -> pt1 <> pt2
+      _ -> false
     end
   end
-
-  defp do_check({s, c} = original, _, <<>>, [a, b]) do
-    IO.puts("#{inspect(original)} => #{a} + #{b}")
-    [eq: pt1, del: ^b, ins: a, eq: pt2] = String.myers_difference(s, c)
-    pt1 <> pt2
-  end
-
-  defp do_check(_, _, <<>>, _), do: nil
-  defp do_check(_, <<>>, _, _), do: nil
 end
